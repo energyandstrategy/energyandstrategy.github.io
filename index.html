@@ -1,43 +1,99 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Energy & Strategy</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Arial', sans-serif;
-            background-color: #1E1E1E; /* dark grey */
-            color: #00B140; /* green */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-        }
-        h1 {
-            font-size: 3em;
-            margin: 0;
-        }
-        p {
-            font-size: 1.5em;
-            margin-top: 10px;
-            color: #CCCCCC;
-        }
-        .logo {
-            font-weight: bold;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Energy & Strategy</title>
+  <style>
+    /* Global Styles */
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #1E1E1E; /* dark grey */
+      color: #CCCCCC;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background-color: #141414;
+      padding: 20px;
+      text-align: center;
+      border-bottom: 2px solid #00B140;
+    }
+
+    header .logo {
+      font-size: 1.8em;
+      font-weight: bold;
+      color: #00B140;
+      letter-spacing: 2px;
+      margin: 0;
+    }
+
+    /* Main */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    main h1 {
+      font-size: 3em;
+      color: #00B140;
+      margin-bottom: 10px;
+    }
+
+    main p {
+      font-size: 1.3em;
+      max-width: 600px;
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    footer {
+      background-color: #141414;
+      padding: 15px;
+      text-align: center;
+      border-top: 1px solid #333;
+      font-size: 0.9em;
+      color: #888;
+    }
+
+    footer a {
+      color: #00B140;
+      text-decoration: none;
+      margin: 0 8px;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
+  <!-- Header -->
+  <header>
     <div class="logo">Energy & Strategy</div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
     <h1>Coming Soon</h1>
     <p>Your hub for green energy insights and strategy.</p>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Energy & Strategy. All rights reserved. | 
+      <a href="#">Contact</a> | 
+      <a href="#">About</a>
+    </p>
+  </footer>
 </body>
 </html>
