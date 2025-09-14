@@ -1,99 +1,446 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Energy & Strategy</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Brand — Professional Boilerplate</title>
+  <meta name="description" content="Boilerplate responsive page with derived brand and accent colors, light/dark themes, and vanilla JS." />
+
+  <!-- Lightweight CSS normalization -->
   <style>
-    /* Global Styles */
-    body {
-      margin: 0;
-      font-family: 'Arial', sans-serif;
-      background-color: #1E1E1E; /* dark grey */
-      color: #CCCCCC;
-      display: flex;
-      flex-direction: column;
+    /* Simple normalize */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body, div, span, applet, object, iframe,
+    h1, h2, h3, h4, h5, h6, p, a, blockquote, pre,
+    abbr, address, big, cite, code, del, dfn, em, img,
+    ins, kbd, q, s, samp, small, strike, strong, sub, sup,
+    tt, var, b, u, i, center, dl, dt, dd, ol, ul, li,
+    fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {
+      margin: 0; padding: 0; border: 0; vertical-align: baseline;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    html, body { height: 100%; }
+    body { line-height: 1.45; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+    img { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+    button { font: inherit; }
+    /* Accessible skip link */
+    .skip-link {
+      position: absolute; left: -999px; top: auto; width: 1px; height: 1px; overflow: hidden;
+    }
+    .skip-link:focus {
+      left: 0; top: 0; width: auto; height: auto; padding: .5rem 1rem; background: #000; color: #fff; z-index: 9999;
+    }
+  </style>
+
+  <!-- Core styles: brand & accent variables (H S L format so variations can be derived) -->
+  <style>
+    :root{
+      /* === Edit these to change brand & accent ===
+         Use H (0-360), S (as percentage with %), L (as percentage with %)
+         Example shown uses a calm blue brand and an orange accent.
+      */
+      --brand-h: 210;
+      --brand-s: 65%;
+      --brand-l: 42%;
+
+      --accent-h: 28;
+      --accent-s: 85%;
+      --accent-l: 50%;
+
+      /* Derived brand variations */
+      --brand: hsl(var(--brand-h) var(--brand-s) var(--brand-l));
+      --brand-strong: hsl(var(--brand-h) var(--brand-s) calc(var(--brand-l) - 8%));
+      --brand-muted: hsl(var(--brand-h) calc(var(--brand-s) - 10%) calc(var(--brand-l) + 18%));
+      --brand-bg: hsl(var(--brand-h) calc(var(--brand-s) - 25%) calc(var(--brand-l) + 35%));
+
+      /* Derived accent variations */
+      --accent: hsl(var(--accent-h) var(--accent-s) var(--accent-l));
+      --accent-strong: hsl(var(--accent-h) var(--accent-s) calc(var(--accent-l) - 10%));
+      --accent-muted: hsl(var(--accent-h) calc(var(--accent-s) - 20%) calc(var(--accent-l) + 20%));
+
+      /* Neutral palette */
+      --surface: hsl(210 12% 98%);
+      --muted: hsl(210 10% 60%);
+      --text: hsl(210 8% 12%);
+      --glass: rgba(255,255,255,0.6);
+
+      /* Layout token */
+      --max-width: 1100px;
+      --radius: 10px;
+      --gap: 1.25rem;
+      --container-padding: clamp(1rem, 2vw, 2rem);
+
+      /* Shadow */
+      --elevation: 0 6px 20px rgba(16,24,40,0.06);
+    }
+
+    /* Dark theme variables override */
+    @media (prefers-color-scheme: dark) {
+      :root:not(.light-mode){
+        --surface: hsl(220 10% 9%);
+        --muted: hsl(220 8% 60%);
+        --text: hsl(220 10% 92%);
+        --glass: rgba(10,10,12,0.5);
+        --brand-bg: hsl(var(--brand-h) calc(var(--brand-s) - 20%) calc(var(--brand-l) - 20%));
+      }
+    }
+
+    /* If user toggles explicit light-mode class, force light tokens */
+    :root.light-mode{
+      --surface: hsl(210 12% 98%);
+      --muted: hsl(210 10% 60%);
+      --text: hsl(210 8% 12%);
+      --glass: rgba(255,255,255,0.6);
+    }
+
+    /* Base layout */
+    html,body{ background: var(--surface); color: var(--text); }
+    .page {
       min-height: 100vh;
-    }
-
-    /* Header */
-    header {
-      background-color: #141414;
-      padding: 20px;
-      text-align: center;
-      border-bottom: 2px solid #00B140;
-    }
-
-    header .logo {
-      font-size: 1.8em;
-      font-weight: bold;
-      color: #00B140;
-      letter-spacing: 2px;
-      margin: 0;
-    }
-
-    /* Main */
-    main {
-      flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      gap: var(--gap);
+    }
+
+    header.site-header{
+      background: linear-gradient(90deg, var(--brand-bg), transparent);
+      padding: .75rem var(--container-padding);
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      position: sticky; top: 0; z-index: 40;
+      backdrop-filter: blur(6px);
+    }
+    .header-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display:flex; align-items:center; gap:1rem;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display:flex; align-items:center; gap:.75rem;
+    }
+    .brand-logo {
+      width:44px; height:44px; border-radius:8px;
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-strong) 100%);
+      display:grid; place-items:center; color: white; font-weight:700; font-size:1.1rem;
+      box-shadow: var(--elevation);
+    }
+    .brand h1{ font-size:1rem; font-weight:700; letter-spacing:0.2px; }
+    .brand p{ font-size:.75rem; color: var(--muted); margin-top:2px; }
+
+    /* Nav */
+    nav.primary-nav{ display:flex; gap:1rem; align-items:center; }
+    nav.primary-nav a { padding:.5rem .6rem; border-radius:8px; color:var(--text); }
+    nav.primary-nav a:hover { background: rgba(0,0,0,0.04); }
+
+    /* Mobile menu button */
+    .menu-toggle{ display:none; background:transparent; border:1px solid transparent; padding:.5rem; border-radius:8px; }
+    .menu-toggle:focus{ outline:2px solid var(--accent); }
+
+    /* Hero */
+    .hero{
+      padding: clamp(2rem, 6vw, 4rem) var(--container-padding);
+      max-width: var(--max-width); margin: 0 auto; display:grid; gap:1rem;
+      grid-template-columns: 1fr 380px;
       align-items: center;
-      text-align: center;
-      padding: 40px 20px;
+    }
+    .hero .hero-copy h2{ font-size: clamp(1.6rem, 3vw, 2.4rem); margin-bottom:.5rem; }
+    .hero .hero-copy p{ color: var(--muted); margin-bottom:1rem; font-size:1.05rem; }
+
+    .cta-group{ display:flex; gap:.75rem; flex-wrap:wrap; }
+    .btn {
+      background: var(--brand); color: white; padding:.6rem 1rem; border-radius:8px; box-shadow: var(--elevation);
+      border: none; cursor: pointer;
+    }
+    .btn.secondary {
+      background: transparent; border: 1px solid var(--accent-muted); color: var(--text);
+    }
+    .hero-visual {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+      border-radius: var(--radius);
+      padding:1rem; box-shadow: var(--elevation);
     }
 
-    main h1 {
-      font-size: 3em;
-      color: #00B140;
-      margin-bottom: 10px;
+    /* Main content */
+    main { padding: 0 var(--container-padding); max-width: var(--max-width); margin: 0 auto; width:100%; flex:1; display:grid; gap:var(--gap); }
+
+    .grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--gap);
     }
 
-    main p {
-      font-size: 1.3em;
-      max-width: 600px;
-      line-height: 1.6;
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.015), transparent);
+      border-radius: var(--radius);
+      padding: 1rem;
+      box-shadow: var(--elevation);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+    .card h3 { margin-bottom:.5rem; }
+    .muted { color: var(--muted); font-size:.95rem; }
+
+    /* Promo bar */
+    .promo {
+      display:flex; gap:1rem; align-items:center; justify-content:space-between;
+      padding: .75rem var(--container-padding); border-radius: 12px;
+      background: linear-gradient(90deg, var(--accent-muted), transparent);
     }
 
     /* Footer */
-    footer {
-      background-color: #141414;
-      padding: 15px;
-      text-align: center;
-      border-top: 1px solid #333;
-      font-size: 0.9em;
-      color: #888;
-    }
+    footer.site-footer { padding: 1.25rem var(--container-padding); border-top: 1px solid rgba(0,0,0,0.04); }
+    .footer-inner { max-width:var(--max-width); margin:0 auto; display:flex; justify-content:space-between; gap:1rem; align-items:center; flex-wrap:wrap; }
 
-    footer a {
-      color: #00B140;
-      text-decoration: none;
-      margin: 0 8px;
-    }
+    /* Tiny utility */
+    .kicker { font-size:.8rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+    .eyebrow { color:var(--brand); font-weight:700; display:inline-block; padding:.15rem .6rem; border-radius:999px; background:var(--brand-bg); font-size:.85rem; }
+    .placeholder-img { width:100%; height:180px; background: linear-gradient(135deg, rgba(0,0,0,0.03), rgba(0,0,0,0.01)); border-radius:8px; display:grid; place-items:center; color:var(--muted); }
 
-    footer a:hover {
-      text-decoration: underline;
+    /* Responsive */
+    @media (max-width: 900px){
+      .hero { grid-template-columns: 1fr; }
+      nav.primary-nav{ display:none; }
+      .menu-toggle{ display:inline-flex; }
+      .mobile-menu { display:none; position:absolute; right:var(--container-padding); top:64px; background:var(--surface); border-radius:10px; padding:.75rem; box-shadow:var(--elevation); min-width:200px; }
+      .mobile-menu.open{ display:block; }
     }
   </style>
 </head>
 <body>
-  <!-- Header -->
-  <header>
-    <div class="logo">Energy & Strategy</div>
-  </header>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="page" id="page">
+    <!-- Header -->
+    <header class="site-header" role="banner">
+      <div class="header-inner">
+        <div class="brand" aria-hidden="false">
+          <div class="brand-logo" aria-hidden="true">B</div>
+          <div>
+            <h1>Brand</h1>
+            <p>Energy · Strategy · Insights</p>
+          </div>
+        </div>
 
-  <!-- Main Content -->
-  <main>
-    <h1>Coming Soon</h1>
-    <p>Your hub for green energy insights and strategy.</p>
-  </main>
+        <nav class="primary-nav" role="navigation" aria-label="Primary navigation">
+          <a href="#" aria-current="page">Home</a>
+          <a href="#">Products</a>
+          <a href="#">Research</a>
+          <a href="#">About</a>
+          <a href="#">Contact</a>
+        </nav>
 
-  <!-- Footer -->
-  <footer>
-    <p>&copy; 2025 Energy & Strategy. All rights reserved. | 
-      <a href="#">Contact</a> | 
-      <a href="#">About</a>
-    </p>
-  </footer>
+        <div style="display:flex;gap:.5rem;align-items:center">
+          <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="mobileMenu" aria-label="Open menu">
+            ☰
+          </button>
+          <button id="themeToggle" aria-pressed="false" title="Toggle light/dark">
+            🌓
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile menu -->
+      <div id="mobileMenu" class="mobile-menu" role="menu" aria-hidden="true">
+        <a role="menuitem" href="#">Home</a><br/>
+        <a role="menuitem" href="#">Products</a><br/>
+        <a role="menuitem" href="#">Research</a><br/>
+        <a role="menuitem" href="#">About</a><br/>
+        <a role="menuitem" href="#">Contact</a>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero" aria-labelledby="heroTitle">
+      <div class="hero-copy">
+        <p class="kicker">Thoughtfully designed</p>
+        <h2 id="heroTitle">Professional boilerplate — responsive & themeable</h2>
+        <p class="muted">A clean starting point with a single brand color and accent. Variations are derived from those tokens so you can update the look by editing just a few values.</p>
+
+        <div class="cta-group">
+          <button class="btn">Get started</button>
+          <button class="btn secondary">Documentation</button>
+        </div>
+
+        <div style="margin-top:1rem" class="muted">Placeholder text — replace with your copy. This section could be a quick pitch, primary metrics, or a signup form.</div>
+      </div>
+
+      <aside class="hero-visual" aria-hidden="false">
+        <div class="placeholder-img" role="img" aria-label="Placeholder: dashboard screenshot">
+          <!-- small inline SVG placeholder -->
+          <svg width="220" height="120" viewBox="0 0 220 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="0" y="0" width="220" height="120" rx="8" fill="url(#g)"/>
+            <defs>
+              <linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="rgba(255,255,255,0.07)"/><stop offset="1" stop-color="rgba(0,0,0,0.03)"/></linearGradient>
+            </defs>
+            <g fill="rgba(255,255,255,0.85)">
+              <rect x="12" y="18" width="68" height="18" rx="3" />
+              <rect x="12" y="44" width="180" height="10" rx="2" />
+              <rect x="12" y="60" width="140" height="10" rx="2" />
+              <rect x="12" y="76" width="90" height="10" rx="2" />
+            </g>
+          </svg>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Main -->
+    <main id="main" role="main">
+      <!-- Promo -->
+      <div class="promo" role="region" aria-label="Promotion">
+        <div>
+          <span class="eyebrow">New</span>
+          <strong style="display:block; margin-top:.25rem;">Premium templates now available</strong>
+          <div class="muted" style="margin-top:.25rem">Get access to additional layouts and components built on this boilerplate.</div>
+        </div>
+        <div style="display:flex;gap:.75rem;align-items:center">
+          <button class="btn">Upgrade</button>
+          <button class="btn secondary">Learn more</button>
+        </div>
+      </div>
+
+      <!-- Cards grid -->
+      <section class="grid" aria-label="Highlights">
+        <article class="card">
+          <h3>Feature-rich</h3>
+          <p class="muted">Header, responsive nav, theme toggle, promo area, cards and placeholders included. Built with accessibility in mind.</p>
+        </article>
+
+        <article class="card">
+          <h3>Design tokens</h3>
+          <p class="muted">Change <code>--brand-h</code>, <code>--brand-s</code>, <code>--brand-l</code> or the accent variables to alter the look across the site.</p>
+        </article>
+
+        <article class="card">
+          <h3>Components</h3>
+          <p class="muted">Cards, hero, promo banner, call-to-action buttons, and a footer are provided as examples.</p>
+        </article>
+
+        <article class="card">
+          <h3>Placeholder imagery</h3>
+          <div class="placeholder-img">Image / Illustration</div>
+        </article>
+      </section>
+
+      <!-- Text/content area -->
+      <section class="card" aria-label="Article">
+        <h3>Sample content</h3>
+        <p class="muted" style="margin-top:.5rem">This is placeholder text demonstrating typographic rhythm. Replace with real copy. Use semantic HTML elements — <code>&lt;article&gt;</code>, <code>&lt;section&gt;</code>, <code>&lt;header&gt;</code> — for structure and accessibility.</p>
+        <p style="margin-top:.75rem">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsam, nostrum. Use these containers to structure your landing page, product pages, blog posts, or documentation hub.</p>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer" role="contentinfo">
+      <div class="footer-inner">
+        <div>
+          <strong>Brand</strong>
+          <div class="muted">© <span id="year"></span> Brand Inc. All rights reserved.</div>
+        </div>
+
+        <div style="display:flex;gap:.75rem;align-items:center">
+          <nav aria-label="footer links" class="muted">
+            <a href="#" style="margin-right:.6rem">Privacy</a>
+            <a href="#" style="margin-right:.6rem">Terms</a>
+            <a href="#">Support</a>
+          </nav>
+          <div class="muted">Made with <span aria-hidden="true">❤</span> in Stockholm</div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Vanilla JS: menu + theme toggle + small helpers -->
+  <script>
+    (function () {
+      // year
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      // Elements
+      const menuToggle = document.getElementById('menuToggle');
+      const mobileMenu = document.getElementById('mobileMenu');
+      const themeToggle = document.getElementById('themeToggle');
+      const root = document.documentElement;
+
+      // Mobile menu toggle
+      menuToggle.addEventListener('click', () => {
+        const open = mobileMenu.classList.toggle('open');
+        menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        mobileMenu.setAttribute('aria-hidden', !open ? 'true' : 'false');
+      });
+
+      // Theme management: respect preference, allow override, persist
+      const THEME_KEY = 'site-theme-mode'; // 'light' | 'dark' | undefined
+
+      function currentPrefersDark() {
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      }
+
+      // Apply stored or preferred theme
+      function applyTheme(mode) {
+        if (mode === 'light') {
+          root.classList.add('light-mode');
+          themeToggle.setAttribute('aria-pressed', 'false');
+          themeToggle.title = 'Switch to dark mode';
+        } else if (mode === 'dark') {
+          root.classList.remove('light-mode');
+          themeToggle.setAttribute('aria-pressed', 'true');
+          themeToggle.title = 'Switch to light mode';
+        } else {
+          // system preference
+          if (currentPrefersDark()) {
+            root.classList.remove('light-mode');
+            themeToggle.setAttribute('aria-pressed', 'true');
+          } else {
+            root.classList.add('light-mode');
+            themeToggle.setAttribute('aria-pressed', 'false');
+          }
+        }
+      }
+
+      // Load saved selection
+      const saved = localStorage.getItem(THEME_KEY);
+      if (saved) applyTheme(saved);
+      else applyTheme(); // system preference
+
+      // Toggle button
+      themeToggle.addEventListener('click', () => {
+        const now = localStorage.getItem(THEME_KEY);
+        if (now === 'dark') {
+          localStorage.setItem(THEME_KEY, 'light');
+          applyTheme('light');
+        } else if (now === 'light') {
+          localStorage.setItem(THEME_KEY, 'dark');
+          applyTheme('dark');
+        } else {
+          // no saved -> flip from system
+          const flipTo = currentPrefersDark() ? 'light' : 'dark';
+          localStorage.setItem(THEME_KEY, flipTo);
+          applyTheme(flipTo);
+        }
+      });
+
+      // Small accessibility: close mobile menu on outside click
+      document.addEventListener('click', (e) => {
+        if (!mobileMenu.contains(e.target) && !menuToggle.contains(e.target) && mobileMenu.classList.contains('open')) {
+          mobileMenu.classList.remove('open');
+          menuToggle.setAttribute('aria-expanded', 'false');
+          mobileMenu.setAttribute('aria-hidden', 'true');
+        }
+      });
+
+      // Keyboard nav: close menu with escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          if (mobileMenu.classList.contains('open')) {
+            mobileMenu.classList.remove('open');
+            menuToggle.setAttribute('aria-expanded', 'false');
+            mobileMenu.setAttribute('aria-hidden', 'true');
+            menuToggle.focus();
+          }
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
